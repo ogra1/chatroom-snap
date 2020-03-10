@@ -1,0 +1,31 @@
+name: chatroom
+base: core18
+version: '0.1'
+summary: A simple WebRTC videochat
+description: |
+  Run your own Videochat server on your Ubuntu Core install.
+  This package installs a minimal WebRTC based Video Chat server.
+  Just open http://<ip of your snappy system>:6565/, allow usage of
+  Camera and Microphone in your browser and run your own Hangout-like chats.
+  Currently it only works with Chromium and Chrome, Firefox can not be used.
+
+grade: stable
+confinement: strict
+
+apps:
+  chatroom:
+    command: node $SNAP/site/server.js
+    daemon: simple
+    environment:
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/$SNAPCRAFT_ARCH_TRIPLET/lib/openssl-1.0.0/engines:$SNAP/$SNAPCRAFT_ARCH_TRIPLET/lib
+      NODE_PATH: $SNAP/node_modules
+    plugs:
+      - network
+      - network-bind
+
+parts:
+  chatroom:
+    plugin: nodejs
+    source: .
+    stage-packages:
+      - libssl1.0.0

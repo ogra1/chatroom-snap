@@ -1,0 +1,14 @@
+{
+  "name": "chatroom",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "ws": "latest",
+    "webrtc.io": "latest",
+    "express": "latest",
+    "webrtc.io-client": "latest"
+  },
+  "scripts": {
+    "start": "node site/server.js"
+  }
+}
