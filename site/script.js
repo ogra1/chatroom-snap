@@ -1,5 +1,5 @@
 var videos = [];
-var PeerConnection = window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection || window.mozRTCPeerConnection || window.RTCPeerConnection;
+var PeerConnection = window.RTCPeerConnection;
 
 function getNumPerRow() {
   var len = videos.length;
@@ -210,13 +210,13 @@ function init() {
       "audio": true
     }, function(stream) {
       document.getElementById('you').srcObject = stream;
-      document.getElementById('you').play();
 
       initMute(stream);
 
-      //videos.push(document.getElementById('you'));
-      //rtc.attachStream(stream, 'you');
-      //subdivideVideos();
+      videos.push(document.getElementById('you'));
+      rtc.attachStream(stream, 'you');
+      subdivideVideos();
+      document.getElementById('you').play();
     });
   } else {
     alert('Your browser is not supported or you have to turn on flags. In chrome you go to chrome://flags and turn on Enable PeerConnection remember to restart chrome');
@@ -225,7 +225,7 @@ function init() {
 
   var room = window.location.hash.slice(1);
 
-  rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], room);
+  rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0], room);
 
   rtc.on('add remote stream', function(stream, socketId) {
     console.log("ADDING REMOTE STREAM...");
@@ -233,6 +233,7 @@ function init() {
     document.getElementById(clone.id).setAttribute("class", "");
     rtc.attachStream(stream, clone.id);
     subdivideVideos();
+    console.log('add ' + socketId);
   });
   rtc.on('disconnect stream', function(data) {
     console.log('remove ' + data);

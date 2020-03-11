@@ -1,10 +1,8 @@
 //CLIENT
 
  // Fallbacks for vendor-specific variables until the spec is finalized.
-	
-var PeerConnection = window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection || window.RTCPeerConnection;
+var PeerConnection = window.RTCPeerConnection;
 var URL = window.URL || window.webkitURL || window.msURL || window.oURL;
-var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia;
 
 (function() {
 
@@ -41,7 +39,7 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
   };
 
   // Holds the STUN/ICE server to use for PeerConnections.
-  rtc.SERVER = {iceServers:[{url:"stun:stun.l.google.com:19302"}]};
+  rtc.SERVER = {iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
 
   // Referenc e to the lone PeerConnection instance.
   rtc.peerConnections = {};
@@ -77,7 +75,6 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
       };
 
       rtc._socket.onerror = function(err) {
-        console.log('onerror');
         console.log(err);
       };
 
@@ -148,7 +145,7 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
   };
 
   rtc.createPeerConnection = function(id) {
-    console.log('createPeerConnection');
+    console.log('createPeerConnection: ' + id);
     var pc = rtc.peerConnections[id] = new PeerConnection(rtc.SERVER);
     pc.onicecandidate = function(event) {
       if (event.candidate) {
@@ -171,9 +168,9 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
       rtc.fire('peer connection opened');
     };
 
-    pc.onaddstream = function(event) {
+    pc.ontrack = function(event) {
       // TODO: Finalize this API
-      rtc.fire('add remote stream', event.stream, id);
+      rtc.fire('add remote stream', event.streams[0], id);
     };
     return pc;
   };
@@ -257,10 +254,10 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
       };
     }
 
-    if (getUserMedia) {
+    if (navigator.mediaDevices.getUserMedia) {
       rtc.numStreams++;
-      getUserMedia.call(navigator, options, function(stream) {
-        
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+          .then(function(stream) {
         rtc.streams.push(stream);
         rtc.initializedStreams++;
         onSuccess(stream);
@@ -288,7 +285,7 @@ var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || nav
 
 
   rtc.attachStream = function(stream, domId) {
-    document.getElementById(domId).src = URL.createObjectURL(stream);
+    document.getElementById(domId).srcObject = stream;
   };
 
   rtc.on('ready', function() {

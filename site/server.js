@@ -1,11 +1,19 @@
 var app = require('express')();
-var server = require('http').createServer(app);
+var https = require('https');
+const fs = require('fs');
+
+var key = fs.readFileSync(process.env.SNAP_DATA + '/server.key');
+var cert = fs.readFileSync(process.env.SNAP_DATA + '/server.crt');
+var options = {
+  key: key,
+  cert: cert
+};
+
+var server = https.createServer(options, app);
 var webRTC = require('webrtc.io').listen(server);
 
 var port = process.env.PORT || 6565;
 server.listen(port);
-
-
 
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
