@@ -1,0 +1,8 @@
+#! /bin/sh
+
+# create a self signed key if none exists
+if [ ! -e "$SNAP_DATA/server.crt" ]; then
+    openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 \
+        -subj "/C=DE/ST=Denial/L=Berlin/O=Snap/CN=snapcraft.io/chatroom" \
+        -keyout $SNAP_DATA/server.key  -out $SNAP_DATA/server.crt
+fi
