@@ -29,3 +29,4 @@ parts:
     source: .
     stage-packages:
       - libssl1.0.0
+      - openssl
